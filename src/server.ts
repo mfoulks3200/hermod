@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 
 export class Server {
     public app = express();
-    public port = process.env.PORT ?? 80;
+    public port = process.env.HERMOD_PORT ?? 80;
 
     constructor() {
         this.app.use(cookieParser());
