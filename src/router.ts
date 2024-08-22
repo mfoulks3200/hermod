@@ -50,6 +50,7 @@ export class Router {
         }
         if (req.cookies["hermod-override"]) {
             const overrideStr = decodeURIComponent(req.cookies["hermod-override"]);
+            console.log(overrideStr);
             this.evaluateOverrides(overrideStr);
         }
     }

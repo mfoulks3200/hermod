@@ -7,17 +7,25 @@ import cookieParser from 'cookie-parser';
 
 export class Server {
     public app = express();
-    public port = 80;
+    public port = process.env.PORT ?? 80;
 
     constructor() {
         this.app.use(cookieParser());
 
-        this.app.get('/index', async (req, res) => {
+        this.app.get('/[\$]hermod/builds', async (req, res) => {
             const host = req.get('host');
-            console.log(`Request received from ${host}`);
-
-            res.header("Content-Type", 'application/json');
-            res.send(JSON.stringify(SiteManager.serializeIndex()));
+            if (!SiteManager.isLoaded()) {
+                const match = SiteManager.attemptMatch(host ?? "");
+                if (match) {
+                    let buildManager = SiteManager.buildManagers.find(bm => bm.site.siteId === match.siteId);
+                    Server.sendJsonObject(res, buildManager?.serializeSanitizedBuildChannels());
+                    res.end();
+                }
+            }
+            if (!res.writableEnded) {
+                res.status(500);
+                res.send("ERROR: 500 Could not load index.");
+            }
         })
 
         this.app.get('/*', async (req, res) => {

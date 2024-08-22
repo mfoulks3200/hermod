@@ -156,7 +156,7 @@ export class SiteManager {
     }
 
     public static attemptMatch(host: string) {
-        if (host.includes("localhost")) {
+        if (process.env.ENV_CONTEXT == "DEV" && host.includes("localhost")) {
             return SiteManager.sites[0];
         }
         let site = SiteManager.sites.find(s => host.includes(s.domain));

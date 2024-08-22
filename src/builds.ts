@@ -11,6 +11,13 @@ export interface File {
     size: number;
 }
 
+interface SerializedBuild {
+    buildNumber: number;
+    buildChannel: string;
+    buildVersion: string;
+    buildCommit: string;
+}
+
 export interface Build {
     siteId: string;
     buildNumber: number;
@@ -61,6 +68,21 @@ export class BuildManager {
             }
         }
         return builds;
+    }
+
+    public serializeSanitizedBuildChannels() {
+        const serializedBuilds: { [key: string]: SerializedBuild[] } = {};
+        for (const channel of Object.keys(this.builds)) {
+            serializedBuilds[channel as string] = this.builds[channel].map(build => {
+                return {
+                    buildNumber: build.buildNumber,
+                    buildChannel: build.buildChannel,
+                    buildVersion: build.buildVersion,
+                    buildCommit: build.buildCommit
+                };
+            });
+        }
+        return serializedBuilds;
     }
 
     public static deserializeBuild(build: BuildChannels, site: SiteConfig): BuildManager {

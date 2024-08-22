@@ -7,7 +7,11 @@ import packageJson from "../package.json";
 
 console.log("Hermod Version " + packageJson.version);
 
-new Config(path.join(__dirname, '../..', 'config.json'));
+const configPath = process.env.ENV_CONTEXT == "DEV" ?
+    path.join(__dirname, '../..', 'config.json') :
+    path.join('/', 'config', 'config.json');
+
+new Config(configPath);
 new AWS();
 SiteManager.initialize(Config.current);
 
