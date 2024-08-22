@@ -16,14 +16,14 @@ export class AWS {
 
     constructor() {
         this.s3Client = new S3Client({
-            region: Config.current.s3Region,
+            region: process.env.AWS_REGION,
         });
         AWS.instance = this;
     }
 
     public async listFiles(path: string) {
         const resp = await this.s3Client.send(new ListObjectsCommand({
-            Bucket: Config.current.s3Bucket,
+            Bucket: process.env.AWS_S3_BUCKET,
             Prefix: path
         }));
         return resp;
@@ -32,7 +32,7 @@ export class AWS {
     public async fileExists(path: string) {
         try {
             await this.s3Client.send(new GetObjectCommand({
-                Bucket: Config.current.s3Bucket,
+                Bucket: process.env.AWS_S3_BUCKET,
                 Key: path
             }));
             return true;
@@ -43,21 +43,21 @@ export class AWS {
 
     public async getFile(path: string) {
         return await this.s3Client.send(new GetObjectCommand({
-            Bucket: Config.current.s3Bucket,
+            Bucket: process.env.AWS_S3_BUCKET,
             Key: path
         }));
     }
 
     public async getSignedLink(path: string) {
         return getSignedUrl(this.s3Client, new GetObjectCommand({
-            Bucket: Config.current.s3Bucket,
+            Bucket: process.env.AWS_S3_BUCKET,
             Key: path
         }), { expiresIn: 3600 });
     }
 
     public async writeFile(path: string, data: string) {
         const resp = await this.s3Client.send(new PutObjectCommand({
-            Bucket: Config.current.s3Bucket,
+            Bucket: process.env.AWS_S3_BUCKET,
             Key: path,
             Body: data
         }));

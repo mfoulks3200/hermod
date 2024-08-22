@@ -54,6 +54,7 @@ FROM base as final
 ENV NODE_ENV production
 
 ENV HERMOD_PORT 80
+ENV AWS_REGION us-east-1
 
 # Run the application as a non-root user.
 USER node

@@ -1,4 +1,6 @@
 import fs from 'node:fs';
+import path from 'node:path';
+import { AWS } from './aws';
 
 export interface SiteConfig {
     siteId: string;
@@ -11,16 +13,22 @@ export interface SiteConfig {
 }
 
 export interface Config {
-    s3Bucket: string;
-    s3Region: string;
     sites: SiteConfig[];
 }
 
 export class Config {
 
     public static current: Config;
+    private static configPath = ".hermod/config.json";
 
-    constructor(path: string) {
-        Config.current = JSON.parse(fs.readFileSync(path, 'utf8'));
+    public async initialize() {
+        if (process.env.ENV_CONTEXT == "DEV") {
+            Config.current = JSON.parse(fs.readFileSync(path.join(__dirname, '../..', 'config.json'), 'utf8'));
+        } else {
+            console.log("Reading config from S3");
+            const newConfig = await AWS.instance.getFile(Config.configPath);
+            Config.current = JSON.parse(await newConfig.Body!.transformToString());
+            console.log("Got config from S3");
+        }
     }
 }
