@@ -1,8 +1,7 @@
-import { ParsedQs } from "qs";
 import { AWS } from "./aws";
 import { SiteConfig } from "./config";
 import { SiteManager } from "./sites";
-import { Request, Response } from 'express-serve-static-core';
+import { ExpressReponse, ExpressRequest } from "./server";
 
 type OverrideType = "channel" | "version" | "build" | "hash";
 const OverrideTypes: OverrideType[] = ["channel", "version", "build", "hash"];
@@ -13,9 +12,6 @@ interface RouterOverrides {
     build?: string;
     hash?: string;
 }
-
-type ExpressRequest = Request<{}, any, any, ParsedQs, Record<string, any>>;
-type ExpressReponse = Response<any, Record<string, any>, number>;
 
 export class Router {
 

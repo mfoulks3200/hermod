@@ -1,9 +1,12 @@
 import express from 'express'
 import { SiteManager } from './sites';
-import { Response } from 'express-serve-static-core';
 import { Router } from './router';
+import { Request, Response } from 'express-serve-static-core';
+import { ParsedQs } from "qs";
 import cookieParser from 'cookie-parser';
 
+export type ExpressRequest = Request<{}, any, any, ParsedQs, Record<string, any>>;
+export type ExpressReponse = Response<any, Record<string, any>, number>;
 
 export class Server {
     public app = express();
@@ -13,11 +16,13 @@ export class Server {
         this.app.use(cookieParser());
 
         this.app.get('/-hermod/healthcheck', async (req, res) => {
+            Server.requestLogger(req, res);
             res.status(SiteManager.isLoaded() ? 200 : 500);
             res.send(SiteManager.isLoaded() ? "OK" : "ERROR");
         });
 
         this.app.get('/-hermod/builds', async (req, res) => {
+            Server.requestLogger(req, res);
             const host = req.get('host');
             if (SiteManager.isLoaded()) {
                 const match = SiteManager.attemptMatch(host ?? "");
@@ -34,10 +39,11 @@ export class Server {
         })
 
         this.app.get('/*', async (req, res) => {
+            Server.requestLogger(req, res);
             const host = req.get('host');
             const path = req.baseUrl + req.path;
 
-            if (!SiteManager.isLoaded()) {
+            if (SiteManager.isLoaded()) {
                 const match = SiteManager.attemptMatch(host ?? "");
                 if (match) {
                     new Router(match).resolvePath(path, req, res)
@@ -55,6 +61,11 @@ export class Server {
         this.app.listen(this.port, () => {
             console.log(`Example app listening on port ${this.port}`)
         })
+    }
+
+    public static requestLogger(req: Request, res: Response) {
+        const host = req.get('host');
+        console.log(`[${new Date().toISOString()}] ${req.method} ${req.ip} ${req.path} ${host}`);
     }
 
     public static sendJsonObject(res: Response<any, Record<string, any>, number>, obj: any) {
