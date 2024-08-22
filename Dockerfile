@@ -56,8 +56,9 @@ ENV NODE_ENV production
 ENV HERMOD_PORT 80
 ENV AWS_REGION us-east-1
 
+
 # Run the application as a non-root user.
-USER node
+USER root
 
 # Copy package.json so that package manager commands can be used.
 COPY package.json .
@@ -66,7 +67,6 @@ COPY package.json .
 # the built application from the build stage into the image.
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/build ./build
-
 
 # Expose the port that the application listens on.
 EXPOSE 80
