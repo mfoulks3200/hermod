@@ -36,6 +36,17 @@ class BuildManager {
             return build.pathRoot;
         });
     }
+    getAllBuildsByCommit() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const builds = new Map();
+            for (const channel of Object.keys(this.builds)) {
+                for (const build of this.builds[channel]) {
+                    builds.set(build.buildCommit, build);
+                }
+            }
+            return builds;
+        });
+    }
     static deserializeBuild(build, site) {
         const bm = new BuildManager(site);
         bm.builds = build;

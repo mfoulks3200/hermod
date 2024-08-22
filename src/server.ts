@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 
 export class Server {
     public app = express();
-    public port = 3000;
+    public port = 80;
 
     constructor() {
         this.app.use(cookieParser());
@@ -31,6 +31,7 @@ export class Server {
                 } else {
                     res.status(200);
                     res.send(`${host} is not configured.`);
+                    SiteManager.startIndexingProcess();
                 }
             } else {
                 res.status(500);

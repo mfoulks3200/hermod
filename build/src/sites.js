@@ -30,6 +30,7 @@ class SiteManager {
                     SiteManager.sites.push(site);
                     SiteManager.buildManagers.push(builds_1.BuildManager.deserializeBuild(site.channels, site));
                 }
+                SiteManager.lastIndexTime = newIndex.generated;
                 console.log("Finished loading index file");
             }
             else {
@@ -43,6 +44,11 @@ class SiteManager {
                 SiteManager.startIndexingProcess();
                 console.log("Index file created");
             }
+            setInterval(() => {
+                if (Date.now() - SiteManager.lastIndexTime > SiteManager.indexInterval) {
+                    SiteManager.startIndexingProcess();
+                }
+            }, 5000);
         });
     }
     static saveIndex() {
@@ -82,11 +88,18 @@ class SiteManager {
     }
     static startIndexingProcess() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (SiteManager.currentlyIndexing) {
+                return;
+            }
+            if (Date.now() - SiteManager.lastIndexTime > SiteManager.minimumIndexInterval) {
+                return;
+            }
             console.log("Starting Indexing Process");
+            SiteManager.currentlyIndexing = true;
             for (let buildManager of SiteManager.buildManagers) {
                 console.log("Indexing", buildManager.site.siteId);
                 let files = yield aws_1.AWS.instance.listFiles(`${buildManager.site.siteId}/${buildManager.site.productionChannelName}`);
-                let existingHashes = new Map();
+                let existingHashes = yield buildManager.getAllBuildsByCommit();
                 for (let file of files.Contents) {
                     let fileNameComponents = file.Key.split("/");
                     let normalizedPath = fileNameComponents.slice(3, fileNameComponents.length).join("/");
@@ -128,6 +141,9 @@ class SiteManager {
                 yield SiteManager.saveIndex();
             }
             yield SiteManager.saveIndex();
+            console.log("Finished Indexing Process");
+            SiteManager.currentlyIndexing = false;
+            SiteManager.lastIndexTime = Date.now();
         });
     }
     static getPosition(string, subString, index) {
@@ -149,4 +165,8 @@ SiteManager.buildIndexPath = ".hermod/index.json";
 SiteManager.loadedIndex = false;
 SiteManager.sites = [];
 SiteManager.buildManagers = [];
+SiteManager.lastIndexTime = 0;
+SiteManager.currentlyIndexing = false;
+SiteManager.indexInterval = 1000 * 60 * 10;
+SiteManager.minimumIndexInterval = 1000 * 15;
 //# sourceMappingURL=sites.js.map

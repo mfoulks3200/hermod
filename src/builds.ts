@@ -53,6 +53,16 @@ export class BuildManager {
         return build.pathRoot;
     }
 
+    public async getAllBuildsByCommit(): Promise<Map<string, Build>> {
+        const builds = new Map<string, Build>();
+        for (const channel of Object.keys(this.builds)) {
+            for (const build of this.builds[channel]) {
+                builds.set(build.buildCommit, build);
+            }
+        }
+        return builds;
+    }
+
     public static deserializeBuild(build: BuildChannels, site: SiteConfig): BuildManager {
         const bm = new BuildManager(site);
         bm.builds = build;

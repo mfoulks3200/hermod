@@ -20,7 +20,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 class Server {
     constructor() {
         this.app = (0, express_1.default)();
-        this.port = 3000;
+        this.port = 80;
         this.app.use((0, cookie_parser_1.default)());
         this.app.get('/index', (req, res) => __awaiter(this, void 0, void 0, function* () {
             const host = req.get('host');
@@ -39,6 +39,7 @@ class Server {
                 else {
                     res.status(200);
                     res.send(`${host} is not configured.`);
+                    sites_1.SiteManager.startIndexingProcess();
                 }
             }
             else {

@@ -15,6 +15,11 @@ export class SiteManager {
     public static sites: SiteConfig[] = [];
     public static buildManagers: BuildManager[] = [];
 
+    public static lastIndexTime: number = 0;
+    public static currentlyIndexing: boolean = false;
+    public static indexInterval: number = 1000 * 60 * 10;
+    public static minimumIndexInterval: number = 1000 * 15;
+
     public static isLoaded(): boolean {
         return SiteManager.loadedIndex;
     }
@@ -32,6 +37,7 @@ export class SiteManager {
                 SiteManager.sites.push(site);
                 SiteManager.buildManagers.push(BuildManager.deserializeBuild(site.channels, site));
             }
+            SiteManager.lastIndexTime = newIndex.generated;
             console.log("Finished loading index file")
         } else {
             console.log("Creating new index file")
@@ -44,6 +50,11 @@ export class SiteManager {
             SiteManager.startIndexingProcess();
             console.log("Index file created")
         }
+        setInterval(() => {
+            if (Date.now() - SiteManager.lastIndexTime > SiteManager.indexInterval) {
+                SiteManager.startIndexingProcess();
+            }
+        }, 5000);
     }
 
     private static async saveIndex() {
@@ -82,11 +93,18 @@ export class SiteManager {
     }
 
     public static async startIndexingProcess() {
+        if (SiteManager.currentlyIndexing) {
+            return;
+        }
+        if (Date.now() - SiteManager.lastIndexTime > SiteManager.minimumIndexInterval) {
+            return;
+        }
         console.log("Starting Indexing Process");
+        SiteManager.currentlyIndexing = true;
         for (let buildManager of SiteManager.buildManagers) {
             console.log("Indexing", buildManager.site.siteId);
             let files = await AWS.instance.listFiles(`${buildManager.site.siteId}/${buildManager.site.productionChannelName}`);
-            let existingHashes: Map<string, Build> = new Map();
+            let existingHashes: Map<string, Build> = await buildManager.getAllBuildsByCommit();
             for (let file of files.Contents!) {
                 let fileNameComponents = file.Key!.split("/");
                 let normalizedPath = fileNameComponents.slice(3, fileNameComponents.length).join("/");
@@ -128,6 +146,9 @@ export class SiteManager {
             await SiteManager.saveIndex();
         }
         await SiteManager.saveIndex();
+        console.log("Finished Indexing Process");
+        SiteManager.currentlyIndexing = false;
+        SiteManager.lastIndexTime = Date.now();
     }
 
     private static getPosition(string: string, subString: string, index: number): number {

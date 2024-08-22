@@ -7,6 +7,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "rm -rf ./build/* && tsc",
+        "build:docker": "docker buildx build --platform=linux/amd64,linux/arm64 -t=hermod .",
         "start": "node --enable-source-maps ./build/src/main.js",
         "dev": "nodemon --watch 'src/**' --ext 'ts,json' --ignore 'src/**/*.spec.ts' --exec 'npm run build && npm start'",
         "watch": "tsc -w"
@@ -22,7 +23,6 @@
     "dependencies": {
         "@aws-sdk/client-s3": "^3.635.0",
         "@aws-sdk/s3-request-presigner": "^3.635.0",
-        "bun": "^1.1.25",
         "cookie-parser": "^1.4.6",
         "express": "^4.19.2"
     }
