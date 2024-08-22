@@ -15,7 +15,6 @@ FROM node:${NODE_VERSION}-alpine as base
 # Set working directory for all build stages.
 WORKDIR /usr/src/app
 
-
 ################################################################################
 # Create a stage for installing production dependecies.
 FROM base as deps
@@ -49,6 +48,8 @@ RUN npm run build
 # Create a new stage to run the application with minimal runtime dependencies
 # where the necessary files are copied from the build stage.
 FROM base as final
+
+RUN apk update && apk --no-cache add curl
 
 # Use production node environment by default.
 ENV NODE_ENV production
