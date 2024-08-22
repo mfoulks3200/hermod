@@ -66,7 +66,16 @@ export class Server {
 
     public static requestLogger(req: Request, res: Response) {
         const host = req.get('host');
-        console.log(`[${new Date().toISOString()}][${req.method}][${req.ip}][${host}][${req.path}][${res.statusCode}]`);
+        const { cookie, authorization, ...headers } = req.headers;
+        console.log({
+            timestamp: new Date().toISOString(),
+            method: req.method,
+            requestIp: req.ip,
+            host: host,
+            path: req.path,
+            status: res.statusCode,
+            headers: headers
+        });
     }
 
     public static sendJsonObject(res: Response<any, Record<string, any>, number>, obj: any) {
