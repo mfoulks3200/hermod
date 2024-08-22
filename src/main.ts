@@ -7,10 +7,12 @@ import packageJson from "../package.json";
 
 console.log("Hermod Version " + packageJson.version);
 
-new AWS();
-const config = new Config();
-config.initialize();
+(async () => {
+    new AWS();
+    const config = new Config();
+    await config.initialize();
 
-SiteManager.initialize(Config.current);
+    await SiteManager.initialize(Config.current);
 
-const server = new Server();
+    const server = new Server();
+})();
