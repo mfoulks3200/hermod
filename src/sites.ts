@@ -55,6 +55,7 @@ export class SiteManager {
                 SiteManager.startIndexingProcess();
             }
         }, 5000);
+        SiteManager.loadedIndex = true;
     }
 
     private static async saveIndex() {
