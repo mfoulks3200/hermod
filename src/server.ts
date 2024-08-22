@@ -19,6 +19,7 @@ export class Server {
             Server.requestLogger(req, res);
             res.status(SiteManager.isLoaded() ? 200 : 500);
             res.send(SiteManager.isLoaded() ? "OK" : "ERROR");
+            res.end();
         });
 
         this.app.get('/-hermod/builds', async (req, res) => {
