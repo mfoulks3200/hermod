@@ -16,14 +16,13 @@ export class Server {
         this.app.use(cookieParser());
 
         this.app.get('/-hermod/healthcheck', async (req, res) => {
-            Server.requestLogger(req, res);
             res.status(SiteManager.isLoaded() ? 200 : 500);
             res.send(SiteManager.isLoaded() ? "OK" : "ERROR");
             res.end();
+            Server.requestLogger(req, res);
         });
 
         this.app.get('/-hermod/builds', async (req, res) => {
-            Server.requestLogger(req, res);
             const host = req.get('host');
             if (SiteManager.isLoaded()) {
                 const match = SiteManager.attemptMatch(host ?? "");
@@ -37,10 +36,10 @@ export class Server {
                 res.status(500);
                 res.send("ERROR: 500 Could not load index.");
             }
+            Server.requestLogger(req, res);
         })
 
         this.app.get('/*', async (req, res) => {
-            Server.requestLogger(req, res);
             const host = req.get('host');
             const path = req.baseUrl + req.path;
 
@@ -57,6 +56,7 @@ export class Server {
                 res.status(500);
                 res.send("ERROR: 500 Could not load index.");
             }
+            Server.requestLogger(req, res);
         })
 
         this.app.listen(this.port, () => {
@@ -66,7 +66,7 @@ export class Server {
 
     public static requestLogger(req: Request, res: Response) {
         const host = req.get('host');
-        console.log(`[${new Date().toISOString()}] ${req.method} ${req.ip} ${req.path} ${host}`);
+        console.log(`[${new Date().toISOString()}][${req.method}][${req.ip}][${host}][${req.path}][${res.statusCode}]`);
     }
 
     public static sendJsonObject(res: Response<any, Record<string, any>, number>, obj: any) {
