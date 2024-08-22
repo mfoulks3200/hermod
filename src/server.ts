@@ -12,12 +12,12 @@ export class Server {
     constructor() {
         this.app.use(cookieParser());
 
-        this.app.get('/[\$]hermod/healthcheck', async (req, res) => {
+        this.app.get('/-hermod/healthcheck', async (req, res) => {
             res.status(SiteManager.isLoaded() ? 200 : 500);
             res.send(SiteManager.isLoaded() ? "OK" : "ERROR");
         });
 
-        this.app.get('/[\$]hermod/builds', async (req, res) => {
+        this.app.get('/-hermod/builds', async (req, res) => {
             const host = req.get('host');
             if (SiteManager.isLoaded()) {
                 const match = SiteManager.attemptMatch(host ?? "");
