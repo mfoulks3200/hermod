@@ -23,6 +23,21 @@ export class Server {
             Server.requestLogger(req, res);
         });
 
+        this.app.get('/-hermod/builds/reindex', async (req, res) => {
+            Server.sendCORSHeaders(res);
+            if (SiteManager.isLoaded()) {
+                SiteManager.startIndexingProcess();
+                res.status(200);
+                res.send("OK");
+                res.end();
+            }
+            if (!res.writableEnded) {
+                res.status(500);
+                res.send("ERROR: 500 Could not load index.");
+            }
+            Server.requestLogger(req, res);
+        })
+
         this.app.get('/-hermod/builds', async (req, res) => {
             Server.sendCORSHeaders(res);
             const host = req.get('host');
@@ -62,7 +77,7 @@ export class Server {
         })
 
         this.app.listen(this.port, () => {
-            console.log(`Example app listening on port ${this.port}`)
+            console.log(`Hermod listening on port ${this.port}`)
         })
     }
 

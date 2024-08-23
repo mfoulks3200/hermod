@@ -95,12 +95,15 @@ export class SiteManager {
 
     public static async startIndexingProcess() {
         if (SiteManager.currentlyIndexing) {
+            console.log("Cannot start a new indexing process, one is already running");
             return;
         }
-        if (Date.now() - SiteManager.lastIndexTime > SiteManager.minimumIndexInterval) {
+        if (Date.now() - SiteManager.lastIndexTime < SiteManager.minimumIndexInterval) {
+            const lastRunAgo = Math.round((Date.now() - SiteManager.lastIndexTime) / 1000);
+            console.log(`Cannot start a new indexing process, one was already run ${lastRunAgo} seconds ago. `);
             return;
         }
-        console.log("Starting Indexing Process");
+        console.log("Starting new indexing process");
         SiteManager.currentlyIndexing = true;
         for (let buildManager of SiteManager.buildManagers) {
             console.log("Indexing", buildManager.site.siteId);
