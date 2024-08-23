@@ -16,6 +16,7 @@ export class Server {
         this.app.use(cookieParser());
 
         this.app.get('/-hermod/healthcheck', async (req, res) => {
+            Server.sendCORSHeaders(res);
             res.status(SiteManager.isLoaded() ? 200 : 500);
             res.send(SiteManager.isLoaded() ? "OK" : "ERROR");
             res.end();
@@ -23,6 +24,7 @@ export class Server {
         });
 
         this.app.get('/-hermod/builds', async (req, res) => {
+            Server.sendCORSHeaders(res);
             const host = req.get('host');
             if (SiteManager.isLoaded()) {
                 const match = SiteManager.attemptMatch(host ?? "");
@@ -76,6 +78,11 @@ export class Server {
             status: res.statusCode,
             headers: headers
         }));
+    }
+
+    public static sendCORSHeaders(res: Response) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     }
 
     public static sendJsonObject(res: Response<any, Record<string, any>, number>, obj: any) {
