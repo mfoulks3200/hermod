@@ -27,7 +27,7 @@ export class AWS {
         let allResults: any[] = [];
         let totalQueries = 0;
         let totalFiles = 0;
-        while (!isComplete) {
+        while (!isComplete && totalQueries < 100) {
             const resp: any = await this.s3Client.send(new ListObjectsCommand({
                 Bucket: process.env.AWS_S3_BUCKET,
                 Prefix: path,
