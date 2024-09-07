@@ -1,6 +1,6 @@
 {
   "name": "hermod",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Atlas Foulks <mfoulks1@gmail.com>",
   "description": "A simple static front end server with versioning",
   "main": "main.ts",
