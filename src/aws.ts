@@ -22,11 +22,26 @@ export class AWS {
     }
 
     public async listFiles(path: string) {
-        const resp = await this.s3Client.send(new ListObjectsCommand({
-            Bucket: process.env.AWS_S3_BUCKET,
-            Prefix: path
-        }));
-        return resp;
+        let lastKey: string | undefined = undefined;
+        let isComplete = false;
+        let allResults: any[] = [];
+        let totalQueries = 0;
+        let totalFiles = 0;
+        while (!isComplete) {
+            const resp: any = await this.s3Client.send(new ListObjectsCommand({
+                Bucket: process.env.AWS_S3_BUCKET,
+                Prefix: path,
+                MaxKeys: 1000,
+                ...(lastKey !== undefined ? { Marker: lastKey } : {})
+            }));
+            isComplete = !resp.IsTruncated;
+            lastKey = resp.Contents?.slice(-1)[0].Key;
+            allResults = allResults.concat(resp.Contents);
+            totalQueries++;
+            totalFiles += resp.Contents?.length;
+        }
+        console.log(`Found ${totalFiles} files in ${totalQueries} queries`);
+        return allResults;
     }
 
     public async fileExists(path: string) {

@@ -10,7 +10,8 @@
     "build:docker": "docker buildx build --platform=linux/amd64,linux/arm64 -t=hermod --no-cache --progress=plain .",
     "start": "node --enable-source-maps --env-file=.env ./build/src/main.js",
     "dev": "nodemon --watch 'src/**' --ext 'ts,json' --ignore 'src/**/*.spec.ts' --exec 'npm run build && npm start'",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "prepare": "husky"
   },
   "license": "GPL-3.0-only",
   "devDependencies": {

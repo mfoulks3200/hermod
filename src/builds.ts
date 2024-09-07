@@ -52,9 +52,9 @@ export class BuildManager {
 
     public static async detectDefaultFile(build: Build): Promise<string> {
         const files = await AWS.instance.listFiles(build.pathRoot + "/index");
-        if (files.Contents) {
-            build.defaultFile = files.Contents[0].Key!;
-            return files.Contents[0].Key!;
+        if (files) {
+            build.defaultFile = files[0].Key!;
+            return files[0].Key!;
         }
         build.defaultFile = build.pathRoot;
         return build.pathRoot;

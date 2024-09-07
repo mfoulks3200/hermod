@@ -109,7 +109,7 @@ export class SiteManager {
             console.log("Indexing", buildManager.site.siteId);
             let files = await AWS.instance.listFiles(`${buildManager.site.siteId}/${buildManager.site.productionChannelName}`);
             let existingHashes: Map<string, Build> = await buildManager.getAllBuildsByCommit();
-            for (let file of files.Contents!) {
+            for (let file of files!) {
                 let fileNameComponents = file.Key!.split("/");
                 let normalizedPath = fileNameComponents.slice(3, fileNameComponents.length).join("/");
                 let fileName = fileNameComponents[fileNameComponents.length - 1];
